@@ -20,7 +20,7 @@ def place_controller_for_every_switch(topo:NetworkGraph):
     return controller_dict
     
 
-#在部署完相应的p4程序添加转发流表，让两个终端自动ping通
+#在域内使得控制信令可以在控制器和交换机之间顺利转发
 def implement_ping_between_two_terminals(host1:str,host2:str,dict:dict,topo:NetworkGraph):
     """使得拓扑中的host1主机和host2主机可以ping通.
 
@@ -41,11 +41,13 @@ def implement_ping_between_two_terminals(host1:str,host2:str,dict:dict,topo:Netw
         mac_right=topo.node_to_node_mac(route[i+1],route[i])
         mac_left=topo.node_to_node_mac(route[i-1],route[i])
         port_left=topo.node_to_node_port_num(route[i],route[i-1])
-        dict[route[i]].table_add('ipv4_lpm','ipv4_forward',[host2_ip],[mac_right,str(port_right)])
-        dict[route[i]].table_add('ipv4_lpm','ipv4_forward',[host1_ip],[mac_left,str(port_left)])
+        dict[route[i]].table_add('ipv4_lpm_for_controll_message','ipv4_forward_for_controll_message',[host2_ip],[mac_right,str(port_right)])
+        dict[route[i]].table_add('ipv4_lpm_for_controll_message','ipv4_forward_for_controll_message',[host1_ip],[mac_left,str(port_left)])
         dict[route[i]].table_add('ipv4_dst_memory','ipv4_forward',[host2_ip],[mac_right,str(port_right)])
         dict[route[i]].table_add('ipv4_dst_memory','ipv4_forward',[host1_ip],[mac_right,str(port_left)])
-        print(f"交换机{route[i]}的流表初始化完成,可以和域内控制器ping通")
+        dict[route[i]].table_add('ipv4_lpm','ipv4_forward',[host2_ip],[mac_right,str(port_right)])
+        dict[route[i]].table_add('ipv4_lpm','ipv4_forward',[host1_ip],[mac_left,str(port_left)])
+        print(f"交换机{route[i]}的流表初始化完成,可以和域内控制器控制信令互通,且能ping通")
 
 
 def make_every_switch_knows_its_CPU_PORT(topo:NetworkGraph,dict:dict):

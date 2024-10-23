@@ -102,6 +102,12 @@ control MyIngress(inout headers hdr,
         standard_metadata.egress_spec = port;
     }
 
+    action ipv4_forward_for_controll_message(bit<48> dst_ethernet, bit<9> port){
+        hdr.ethernet.srcAddr=hdr.ethernet.dstAddr;
+        hdr.ethernet.dstAddr=dst_ethernet;
+        standard_metadata.egress_spec = port;
+    }
+
     action set_cpu_port(bit<9> CPU_PORT){
         standard_metadata.egress_spec=CPU_PORT;
     }
@@ -110,6 +116,17 @@ control MyIngress(inout headers hdr,
         hdr.request.deviceid=deviceid;
     }
 
+    table ipv4_lpm_for_controll_message{
+        key={
+            hdr.ipv4.dst_addr: exact;
+        }
+        actions={
+            ipv4_forward_for_controll_message;
+            drop;
+        }
+        size = 1024;
+        default_action = drop;
+    }
 
     table set_deviceid{
         key = {
@@ -172,10 +189,15 @@ control MyIngress(inout headers hdr,
     apply{
         bool use_cpu_port;
         use_cpu_port=false;
-        if(hdr.ipv4.protocol==151 && if_the_deviceid_hit.apply().hit){
+        if(hdr.ipv4.protocol==151){
+            if(if_the_deviceid_hit.apply().hit){
+                use_cpu_port=true;
+            }else{
+                ipv4_lpm_for_controll_message.apply();
+            }
+        }else if(hdr.ipv4.protocol==150){
             use_cpu_port=true;
-        }
-        if(hdr.ipv4.protocol!=150){
+        }else{
             if(ipv4_dst_memory.apply().hit){ 
                 ipv4_lpm.apply();
             }else{
@@ -185,8 +207,6 @@ control MyIngress(inout headers hdr,
                 hdr.ipv4.protocol=150;
                 use_cpu_port=true;
             }
-        }else if(hdr.ipv4.protocol==150){  //这个是域内交换机的request
-            use_cpu_port=true;
         }
         if(use_cpu_port){
             set_cpu_port_for_this_packet.apply();

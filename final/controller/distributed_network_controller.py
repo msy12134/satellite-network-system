@@ -1,6 +1,6 @@
 from start_method import *
 import asyncio
-topo = load_topo('/home/mao/Desktop/systerm-code/final/network/topology.json')
+topo = load_topo('/home/maomao/Desktop/satellite-network-system/final/network/topology.json')
 domain_1=get_controller_domain("01","05","07","12")
 domain_2=get_controller_domain("06","10","07","12")
 domain_3=get_controller_domain("01","05","01","06")
@@ -93,37 +93,37 @@ for i in controller_dict:
             c4.start_receiving_cpu_packet()
         else:
             mycontroller(sniff_port_name,controller_dict[i],switch_to_deviceID_dict_domain_4,topo,4).start_receiving_cpu_packet()
-hot_switch_name=input("enter the switch name:")#输入domain1中的某个交换机的名称
-#得出其他三个域中的交换机到这个热点交换机的路径
-route_list_domain2=[]
-for i in domain_2:
-    # route2=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
-    # route2=list(route2)
-    # for j in route2:
-    #     if j not in domain_2:
-    #         route2.remove(j)
-    route_list_domain2.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
-route_list_domain3=[]
-for i in domain_3:
-    #route3=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
-    # route3=list(route3)
-    # for j in route3:
-    #     if j not in domain_3:
-    #         route3.remove(j)
-    route_list_domain3.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
-route_list_domain4=[]
-for i in domain_4:
-    #route4=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
-    # route4=list(route4)
-    # for j in route4:
-    #     if j not in domain_4:
-    #         route4.remove(j)
-    route_list_domain4.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
-c2.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
-c3.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
-c4.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
-print(c2.hot_switch_ip,c3.hot_switch_ip,c4.hot_switch_ip)
-c2.fake_database=route_list_domain2
-c3.fake_database=route_list_domain3
-c4.fake_database=route_list_domain4
+# hot_switch_name=input("enter the switch name:")#输入domain1中的某个交换机的名称
+# #得出其他三个域中的交换机到这个热点交换机的路径
+# route_list_domain2=[]
+# for i in domain_2:
+#     # route2=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
+#     # route2=list(route2)
+#     # for j in route2:
+#     #     if j not in domain_2:
+#     #         route2.remove(j)
+#     route_list_domain2.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
+# route_list_domain3=[]
+# for i in domain_3:
+#     #route3=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
+#     # route3=list(route3)
+#     # for j in route3:
+#     #     if j not in domain_3:
+#     #         route3.remove(j)
+#     route_list_domain3.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
+# route_list_domain4=[]
+# for i in domain_4:
+#     #route4=topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0]
+#     # route4=list(route4)
+#     # for j in route4:
+#     #     if j not in domain_4:
+#     #         route4.remove(j)
+#     route_list_domain4.append(topo.get_shortest_paths_between_nodes(i,hot_switch_name)[0])
+# c2.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
+# c3.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
+# c4.hot_switch_ip=topo.get_host_ip("h"+hot_switch_name[1:])
+# print(c2.hot_switch_ip,c3.hot_switch_ip,c4.hot_switch_ip)
+# c2.fake_database=route_list_domain2
+# c3.fake_database=route_list_domain3
+# c4.fake_database=route_list_domain4
 

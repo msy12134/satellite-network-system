@@ -102,6 +102,13 @@ control MyIngress(inout headers hdr,
         standard_metadata.egress_spec = port;
     }
 
+    action ipv4_forward_for_controll_message(bit<48> dst_ethernet, bit<9> port){
+        hdr.ethernet.srcAddr=hdr.ethernet.dstAddr;
+        hdr.ethernet.dstAddr=dst_ethernet;
+        standard_metadata.egress_spec = port;
+    }
+
+
     action set_deviceid_in_request(bit<8> deviceid){
         hdr.request.deviceid=deviceid;
     }
@@ -113,6 +120,19 @@ control MyIngress(inout headers hdr,
     action set_packet_ipv4dst_to_controllerip(bit<32> controller_ipv4){
         hdr.ipv4.dst_addr=controller_ipv4;
     }
+
+    table ipv4_lpm_for_controll_message{
+        key={
+            hdr.ipv4.dst_addr: exact;
+        }
+        actions={
+            ipv4_forward_for_controll_message;
+            drop;
+        }
+        size = 1024;
+        default_action = drop;
+    }
+
 
     table table_set_packet_ipv4dst_to_controllerip{
         key={
@@ -187,34 +207,30 @@ control MyIngress(inout headers hdr,
     apply{
         bool use_ipv4_lpm;
         use_ipv4_lpm=false;
-       if(ipv4_dst_memory.apply().hit){//这张表的用处就是单纯来查看这个数据包的目的地址是否是已经记录的地址
-            if(hdr.ipv4.protocol!=151 && hdr.ipv4.protocol!=150){
+        if (hdr.ipv4.protocol==151 || hdr.ipv4.protocol==150){
+            if (if_the_deviceid_hit.apply().hit){
+                set_cpu_port_for_this_packet.apply();
+            }else{
+                ipv4_lpm_for_controll_message.apply();//控制信令的专门转发逻辑
+            }
+            
+        }else{
+            if(ipv4_dst_memory.apply().hit){//这张表的用处就是单纯来查看这个数据包的目的地址是否是已经记录的地址
                 use_ipv4_lpm=true;   //只是记录在的普通数据包，那就转发
             }else{
-                if(hdr.ipv4.protocol==150){
-                    use_ipv4_lpm=true;
-                }else if(hdr.ipv4.protocol==151){
-                    if(if_the_deviceid_hit.apply().hit){
-                        // standard_metadata.egress_spec=CPU_PORT;
-                        set_cpu_port_for_this_packet.apply();
-                    }
-                    else{
-                        use_ipv4_lpm=true;
-                    }
-                }
+                hdr.request.setValid();
+                set_deviceid.apply();
+                hdr.request.dst_addr=hdr.ipv4.dst_addr;
+                hdr.ipv4.protocol=150;
+                table_set_packet_ipv4dst_to_controllerip.apply();
+                use_ipv4_lpm=true;
             }
-       }else{
-        hdr.request.setValid();
-        set_deviceid.apply();
-        hdr.request.dst_addr=hdr.ipv4.dst_addr;
-        hdr.ipv4.protocol=150;
-        table_set_packet_ipv4dst_to_controllerip.apply();
-        use_ipv4_lpm=true;
-       }
-       if (use_ipv4_lpm){
-        ipv4_lpm.apply();
-       }
+            if (use_ipv4_lpm){
+                ipv4_lpm.apply();
+            }
+        }
     }
+       
 }
 
 control MyEgress(inout headers hdr,

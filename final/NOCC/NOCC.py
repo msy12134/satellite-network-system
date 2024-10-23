@@ -33,7 +33,7 @@ domain_1=get_controller_domain("01","05","07","12")
 domain_2=get_controller_domain("06","10","07","12")
 domain_3=get_controller_domain("01","05","01","06")
 domain_4=get_controller_domain("06","10","01","06")
-topo = load_topo('/home/mao/Desktop/systerm-code/final/network/topology.json')
+topo = load_topo('/home/maomao/Desktop/satellite-network-system/final/network/topology.json')
 app=FastAPI()
 domain_dict={"1":domain_1,"2":domain_2,"3":domain_3,"4":domain_4}
 
