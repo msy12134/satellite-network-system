@@ -11,4 +11,4 @@ def packet_callback(pkt):
         print((timestamp_now-float(timestamp))*1000)
 
 # 捕获数据包
-sniff(prn=packet_callback, filter="ip",count=1,iface="1002-eth0")
+sniff(prn=packet_callback, filter="ip",count=1,iface="h01002-eth0")

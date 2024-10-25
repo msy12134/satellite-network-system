@@ -9,6 +9,14 @@ raw_data=[
             ('0201', '1002'), ('0103', '0408'), ('0901', '0208'), ('0201', '1009'), ('0408', '0910'),
             ('0103', '0109'), ('0512', '0608'), ('1012', '0503'), ('0805', '0203'), ('0511', '0910')
         ]
+in_domain_data=[
+    ('0505', '0501'), ('0302', '0105'), ('0502', '0503'), ('0303', '0205'), ('0102', '0206'),
+    ('0203', '0502'), ('0306', '0302'), ('0305', '0306'), ('0302', '0501'), ('0503', '0405'),
+    ('0505', '0204'), ('0205', '0205'), ('0305', '0203'), ('0301', '0201'), ('0402', '0504'),
+    ('0202', '0302'), ('0306', '0201'), ('0105', '0405'), ('0204', '0401'), ('0105', '0406'),
+    ('0502', '0406'), ('0104', '0202'), ('0404', '0104'), ('0504', '0203'), ('0203', '0305'),
+    ('0401', '0106'), ('0501', '0103'), ('0504', '0402'), ('0403', '0305'), ('0106', '0101')
+]
 model_for_send="""
 import time
 from scapy.layers.l2 import Ether
@@ -40,9 +48,9 @@ def packet_callback(pkt):
 sniff(prn=packet_callback, filter="ip",count=1,iface="{receive_iface}")
 """
 file_path="/home/maomao/Desktop/satellite-network-system/final/network"
-file_path=os.path.join(file_path,"between_domain")
+file_path=os.path.join(file_path,"in_domain")
 os.makedirs(file_path)
-for i in raw_data:
+for i in in_domain_data:
     host_from,host_to="h0"+i[0],"h0"+i[1]
     folder_name=os.path.join(file_path,host_from+"to"+host_to)
     os.makedirs(folder_name,exist_ok=True)
@@ -50,6 +58,6 @@ for i in raw_data:
         file_content=model_for_send.format(send_iface=host_from+"-eth0",dst_ipv4=topo.get_host_ip(host_to))
         file1.write(file_content)
     with open(os.path.join(folder_name,"receive.py"),"w") as file2:
-        file_content=model_for_receive.format(receive_iface=i[1]+"-eth0")
+        file_content=model_for_receive.format(receive_iface=host_to+"-eth0")
         file2.write(file_content)
 
