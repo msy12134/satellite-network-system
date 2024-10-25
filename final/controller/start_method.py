@@ -33,7 +33,7 @@ def implement_ping_between_two_terminals(host1:str,host2:str,dict:dict,topo:Netw
     Returns:
         None: 
     """
-    route=topo.get_shortest_paths_between_nodes(host1,host2)[0]
+    route=topo.get_shortest_paths_between_nodes(host1,host2)[-1]
     print(route)
     host1_ip,host2_ip=topo.get_host_ip(host1),topo.get_host_ip(host2)
     for i in range(1,len(route)-1):
