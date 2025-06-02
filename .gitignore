@@ -1,7 +1,6 @@
 log/
 pcap/
 *.p4i
-*.json
 .pytest_cache
 .vscode
 __pycache__/
