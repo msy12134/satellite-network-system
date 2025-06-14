@@ -1,5 +1,6 @@
 from scapy.all import *
 from headers_definition import *
+import json
 def circle_packet_handler(packet):
     """专门用来解析收到的环路数据包"""
     result={"int_segment_num":0,"circle_id":0,"int_info":[]}
@@ -22,11 +23,14 @@ def circle_packet_handler(packet):
         result["int_info"].append(int_info)
         int_header=int_segment
     print(f"Received INT packet: {result}")
-    save_int_info_to_database(result)
+    save_int_info_to_file(result)
     
 
 
-def save_int_info_to_database(parsed_packet_info):#databases指的是具体的拓扑，table指代具体的环路
-    """ Save INT segment information to the database."""
-    pass
-sniff(iface="h12-eth0", prn=circle_packet_handler)
+def save_int_info_to_file(parsed_packet_info):#databases指的是具体的拓扑，table指代具体的环路
+    """ 把解析后的环路数据包信息保存到文件中 """
+    circle_id= parsed_packet_info["circle_id"]
+    with open(f"data/circle_{circle_id}.txt", "a") as f:
+        f.write(json.dumps(parsed_packet_info) + "\n")
+if __name__ == "__main__":
+    sniff(iface="h12-eth0", prn=circle_packet_handler)

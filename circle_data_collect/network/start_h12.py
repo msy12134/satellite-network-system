@@ -53,7 +53,7 @@ def create_packet(sr_info_list:List[int],circle_id:int): # type: ignore
 
 def send_packet(packet,iface:str):
     """Send the packet on the specified interface."""
-    sendp(packet, iface=iface)  # Replace "eth0" with your network interface
+    sendp(packet, iface=iface,count=10000,inter=0.1)  # Replace "eth0" with your network interface
 
 
 if __name__ == "__main__":
