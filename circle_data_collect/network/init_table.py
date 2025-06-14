@@ -3,7 +3,6 @@ from p4utils.utils.sswitch_thrift_API import SimpleSwitchThriftAPI
 import json
 topo = load_topo("topology.json")
 
-
 if __name__ == "__main__":
         
     refer_dict={}#键为交换机的名字，值为字典，端口号对应sr信息
