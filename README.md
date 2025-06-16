@@ -1,6 +1,6 @@
 # circle-data-collect
 收集环时延数据
 
-运行circle_data_collect_network.py搭建拓扑
-运行init_table.py初始化流表
-分别在h3，h12运行发包收包程序，数据会在data目录下
+在一个终端中运行circle_data_collect_network.py搭建拓扑
+在另一个终端中运行init_table.py初始化流表
+启动终端h3和h12，分别运行start和receive文件即可
